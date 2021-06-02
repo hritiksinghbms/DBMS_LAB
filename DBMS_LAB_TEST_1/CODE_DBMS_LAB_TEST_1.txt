@@ -1,0 +1,87 @@
+CODE :-
+CREATE TABLE pizza( 
+pid INT, 
+pname VARCHAR(20),
+quality INT,
+address VARCHAR (20),
+PRIMARY KEY(pid)
+);
+
+CREATE TABLE store(
+sid INT,
+sname VARCHAR(20),
+phone INT,
+qualityrating VARCHAR(20),
+PRIMARY KEY(sid)
+);
+
+CREATE TABLE soldby(
+pid INT,
+sid INT,
+price FLOAT,
+PRIMARY KEY(pid,sid),
+FOREIGN KEY(pid) REFERENCES pizza(pid) ON DELETE CASCADE ON UPDATE CASCADE,
+FOREIGN KEY(sid) REFERENCES store(sid) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+INSERT INTO pizza VALUES('2', 'cheese','10','Varanasi');
+INSERT INTO pizza VALUES('3', 'paneer','9','Patna');
+INSERT INTO pizza VALUES('4', 'sauce','8','Ballia');
+INSERT INTO pizza VALUES('5', 'large','7','Gujarat');
+INSERT INTO pizza VALUES('6', 'veggie','10','Ladakh');
+
+INSERT INTO store VALUES('100','pizzahut','911','excellent');
+INSERT INTO store VALUES('101','dominoes','912','good');
+INSERT INTO store VALUES('102','gpizza','913','great');
+INSERT INTO store VALUES('103','hotpizza','914','excellent');
+INSERT INTO store VALUES('104','coolpizza','915','good');
+
+INSERT INTO soldby VALUES('5','102','1500.99');
+INSERT INTO soldby VALUES('2','103','999.99');
+INSERT INTO soldby VALUES('3','100','50.15');
+INSERT INTO soldby VALUES('4','104','99.99');
+INSERT INTO soldby VALUES('6','101','20.32');
+
+/*QUERY 2*/
+
+SELECT * FROM pizza;
+
+SELECT * FROM store;
+
+SELECT * FROM soldby;
+
+/*QUERY 3*/
+
+SELECT DISTINCT s.sname FROM store s, soldby sb, pizza p WHERE sb.pid=p.pid AND sb.sid=s.sid AND sb.pid IN (SELECT p1.pid FROM pizza p1 WHERE p1.pname='veggie' AND p1.pname="cheese");
+
+/*QUERY 4*/
+
+Select s.sname,s.phone from store s, soldby sb where sb.sid=s.sid and sb.price<100 group by s.sname having s.qualityrating="good" or s.qualityrating="excellent";
+
+/*QUERY 5*/
+
+UPDATE soldby SET price=price *1.1 WHERE pid=(SELECT pid FROM pizza WHERE pname='chesse');
+
+SELECT * FROM soldby;
+
+/*QUERY 6*/
+
+
+SELECT AVG(soldby.price) AS "Average Price", 
+   store.sname AS "store"
+      FROM store, soldby
+         WHERE store.sid= soldby.sid
+           GROUP BY store.sname
+             HAVING AVG(soldby.price) >(SELECT AVG(price) FROM soldby);
+             
+             
+             
+          
+ /*QUERY 7*/         
+          
+CREATE VIEW soldpizza (Pname, Totalpice, Avgprice) AS SELECT p1.pname, sum(sb.price), avg(sb.price) FROM pizza p1, soldby sb where sb.pid=p1.pid GROUP BY p.pname;
+
+
+
+
+
